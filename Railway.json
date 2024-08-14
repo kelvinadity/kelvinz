@@ -1,0 +1,32 @@
+{
+  "services": {
+    "database": {
+      "image": "mariadb:10.5",
+      "environment": {
+        "MYSQL_PASSWORD": "CHANGE_ME",
+        "MYSQL_ROOT_PASSWORD": "CHANGE_ME_TOO",
+        "MYSQL_DATABASE": "panel",
+        "MYSQL_USER": "pterodactyl"
+      },
+      "volumes": [
+        "/srv/pterodactyl/database:/var/lib/mysql"
+      ]
+    },
+    "cache": {
+      "image": "redis:alpine"
+    },
+    "panel": {
+      "build": "./Dockerfile",
+      "ports": [
+        "80:80",
+        "443:443"
+      ],
+      "volumes": [
+        "/srv/pterodactyl/var/:/app/var/",
+        "/srv/pterodactyl/nginx/:/etc/nginx/http.d/",
+        "/srv/pterodactyl/certs/:/etc/letsencrypt/",
+        "/srv/pterodactyl/logs/:/app/storage/logs"
+      ]
+    }
+  }
+}
