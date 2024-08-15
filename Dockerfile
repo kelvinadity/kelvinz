@@ -23,9 +23,6 @@ ENV REDIS_HOST=cache
 ENV DB_HOST=database
 ENV DB_PORT=3306
 
-# Salin file konfigurasi jika diperlukan
-COPY ./config /app/config
-
 # Expose ports for HTTP and HTTPS
 EXPOSE 80
 EXPOSE 443
