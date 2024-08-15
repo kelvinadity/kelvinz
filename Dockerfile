@@ -28,9 +28,10 @@ ENV APP_URL=https://pterodactyl.example.com \
 EXPOSE 80
 EXPOSE 443
 
-# Copy setup script
+# Copy setup and run scripts
 COPY setup.sh /setup.sh
-RUN chmod +x /setup.sh
+COPY run.sh /run.sh
+RUN chmod +x /setup.sh /run.sh
 
-# Run setup script
-CMD ["/setup.sh"]
+# Run setup script and then the main application
+CMD ["/bin/bash", "-c", "/setup.sh && /run.sh"]
