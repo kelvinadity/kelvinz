@@ -6,19 +6,19 @@ services:
     restart: always
     command: --default-authentication-plugin=mysql_native_password
     volumes:
-      - "/srv/pterodactyl/database:/var/lib/mysql"
+      - "database_data:/var/lib/mysql"
     environment:
-      MYSQL_PASSWORD: "CHANGE_ME"
-      MYSQL_ROOT_PASSWORD: "CHANGE_ME_TOO"
-      MYSQL_DATABASE: "panel"
-      MYSQL_USER: "pterodactyl"
-  
+      MYSQL_PASSWORD: "CHANGE_ME"          # Password for the MariaDB user
+      MYSQL_ROOT_PASSWORD: "CHANGE_ME_TOO"  # Root password for MariaDB
+      MYSQL_DATABASE: "panel"               # Default database name
+      MYSQL_USER: "pterodactyl"             # User for the default database
+
   cache:
     image: redis:alpine
     restart: always
 
   panel:
-    build: .
+    image: ghcr.io/pterodactyl/panel:latest
     restart: always
     ports:
       - "80:80"
@@ -27,31 +27,39 @@ services:
       - database
       - cache
     volumes:
-      - "/srv/pterodactyl/var/:/app/var/"
-      - "/srv/pterodactyl/nginx/:/etc/nginx/http.d/"
-      - "/srv/pterodactyl/certs/:/etc/letsencrypt/"
-      - "/srv/pterodactyl/logs/:/app/storage/logs"
+      - "panel_var:/app/var/"
+      - "panel_nginx:/etc/nginx/http.d/"
+      - "panel_certs:/etc/letsencrypt/"
+      - "panel_logs:/app/storage/logs"
     environment:
-      DB_PASSWORD: "CHANGE_ME"
-      APP_URL: "https://pterodactyl.example.com"
-      APP_TIMEZONE: "UTC"
-      APP_SERVICE_AUTHOR: "noreply@example.com"
-      TRUSTED_PROXIES: "*"
-      MAIL_FROM: "noreply@example.com"
-      MAIL_DRIVER: "smtp"
-      MAIL_HOST: "mail"
-      MAIL_PORT: "1025"
-      MAIL_USERNAME: ""
-      MAIL_PASSWORD: ""
-      MAIL_ENCRYPTION: "true"
-      APP_ENV: "production"
-      APP_ENVIRONMENT_ONLY: "false"
-      CACHE_DRIVER: "redis"
-      SESSION_DRIVER: "redis"
-      QUEUE_DRIVER: "redis"
-      REDIS_HOST: "cache"
-      DB_HOST: "database"
-      DB_PORT: "3306"
+      APP_URL: "https://pterodactyl.example.com" # URL for the Pterodactyl panel
+      APP_TIMEZONE: "UTC"                        # Timezone for the application
+      APP_SERVICE_AUTHOR: "noreply@example.com" # Service author email
+      TRUSTED_PROXIES: "*"                      # Trusted proxies for security
+      LE_EMAIL: ""                             # Email for Let's Encrypt (if using SSL)
+      MAIL_FROM: "noreply@example.com"         # Email from address
+      MAIL_DRIVER: "smtp"                       # Mail driver
+      MAIL_HOST: "mail"                        # SMTP server address
+      MAIL_PORT: "1025"                        # SMTP server port
+      MAIL_USERNAME: ""                        # SMTP username
+      MAIL_PASSWORD: ""                        # SMTP password
+      MAIL_ENCRYPTION: "true"                  # SMTP encryption
+      DB_PASSWORD: "CHANGE_ME"                 # Database password
+      APP_ENV: "production"                    # Application environment
+      APP_ENVIRONMENT_ONLY: "false"            # Restrict environment settings
+      CACHE_DRIVER: "redis"                    # Cache driver
+      SESSION_DRIVER: "redis"                  # Session driver
+      QUEUE_DRIVER: "redis"                    # Queue driver
+      REDIS_HOST: "cache"                      # Redis host
+      DB_HOST: "database"                     # Database host
+      DB_PORT: "3306"                          # Database port
+
+volumes:
+  database_data:
+  panel_var:
+  panel_nginx:
+  panel_certs:
+  panel_logs:
 
 networks:
   default:
